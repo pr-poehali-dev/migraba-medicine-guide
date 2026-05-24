@@ -3,6 +3,280 @@ import Icon from "@/components/ui/icon";
 
 type Section = "home" | "classifications" | "recommendations" | "search" | "about" | "contacts";
 
+const REC_DETAILS: Record<number, {
+  tabs: { key: string; label: string; icon: string; content: { title: string; items: string[] }[] }[];
+}> = {
+  1: {
+    tabs: [
+      {
+        key: "diagnostics", label: "Диагностика", icon: "Microscope",
+        content: [
+          { title: "Первичная диагностика", items: ["Измерение АД на обеих руках трёхкратно с интервалом 2 мин", "Суточное мониторирование АД (СМАД) при подозрении на белохалатную гипертензию", "Сбор анамнеза: наследственность, факторы риска, сопутствующие заболевания"] },
+          { title: "Физикальное обследование", items: ["Аускультация сердца и сосудов", "Пальпация пульса на периферических артериях", "Измерение ИМТ и окружности талии", "Осмотр глазного дна при тяжёлой гипертензии"] },
+          { title: "Стратификация риска", items: ["Оценка суммарного сердечно-сосудистого риска по шкале SCORE", "Выявление поражений органов-мишеней", "Классификация по стадиям I–III и степени I–III"] },
+        ],
+      },
+      {
+        key: "labs", label: "Лаборатория", icon: "FlaskConical",
+        content: [
+          { title: "Обязательные анализы", items: ["ОАК (гемоглобин, эритроциты, лейкоциты)", "Биохимия: глюкоза натощак, креатинин, мочевина, мочевая кислота", "Липидный профиль: ОХС, ЛПНП, ЛПВП, триглицериды", "Калий, натрий — перед назначением диуретиков и иАПФ", "ОАМ с микроскопией осадка, альбуминурия"] },
+          { title: "Дополнительные анализы", items: ["ТТГ при подозрении на патологию щитовидной железы", "Альдостерон/ренин при рефрактерной гипертензии", "Кортизол суточной мочи при признаках гиперкортицизма", "Катехоламины мочи при подозрении на феохромоцитому"] },
+        ],
+      },
+      {
+        key: "instrumental", label: "Инструментальные", icon: "Activity",
+        content: [
+          { title: "Обязательные исследования", items: ["ЭКГ в 12 отведениях (гипертрофия ЛЖ, нарушения ритма)", "ЭхоКГ — оценка функции и геометрии ЛЖ, ИММЛЖ", "УЗИ почек с допплерографией почечных артерий", "Дуплексное сканирование сонных артерий (толщина КИМ)"] },
+          { title: "По показаниям", items: ["КТ/МРТ надпочечников при вторичной гипертензии", "Сцинтиграфия почек при реноваскулярной гипертензии", "Суточное мониторирование АД — контроль эффективности терапии"] },
+        ],
+      },
+      {
+        key: "treatment", label: "Лечение", icon: "Pill",
+        content: [
+          { title: "Немедикаментозная терапия", items: ["Ограничение соли до 5 г/сут", "Снижение веса при ИМТ >25 кг/м²", "Регулярная аэробная нагрузка 30–40 мин 5 дней/нед", "Отказ от курения и ограничение алкоголя", "DASH-диета (овощи, фрукты, обезжиренные молочные продукты)"] },
+          { title: "Медикаментозная терапия — препараты 1-й линии", items: ["иАПФ (эналаприл, лизиноприл, периндоприл) — при СД, ХБП, ХСН", "БРА (лозартан, валсартан) — при непереносимости иАПФ", "Антагонисты кальция (амлодипин) — при ИБС, пожилые", "Тиазидные диуретики (гидрохлоротиазид 12,5–25 мг) — монотерапия I степени", "Бета-блокаторы (бисопролол) — при ИБС, тахикардии, ХСН"] },
+          { title: "Комбинированная терапия", items: ["Предпочтительна фиксированная комбинация двух препаратов", "иАПФ/БРА + АК или тиазидный диуретик — при II–III степени", "Тройная комбинация при неэффективности двойной через 4 нед", "Целевое АД: <140/90 мм рт.ст., при СД <130/80 мм рт.ст."] },
+        ],
+      },
+      {
+        key: "surgery", label: "Хирургия", icon: "Scissors",
+        content: [
+          { title: "Показания к хирургическому лечению", items: ["Реноваскулярная гипертензия: стентирование почечных артерий при гемодинамически значимом стенозе >70%", "Феохромоцитома: лапароскопическая адреналэктомия", "Первичный гиперальдостеронизм (аденома): лапароскопическая адреналэктомия", "Коарктация аорты: эндоваскулярное стентирование или хирургическая коррекция"] },
+          { title: "Интервенционные методы при рефрактерной гипертензии", items: ["Денервация почечных артерий (ренальная денервация) — при резистентной АГ на фоне ≥3 препаратов", "Стимуляция барорецепторов каротидного синуса (Barostim neo)"] },
+        ],
+      },
+      {
+        key: "monitoring", label: "Наблюдение", icon: "CalendarCheck",
+        content: [
+          { title: "График наблюдения", items: ["Через 4 нед после начала лечения — оценка эффекта и переносимости", "Каждые 3 мес до достижения целевого АД", "1 раз в 6 мес при стабильном целевом АД", "1 раз в год — полный контроль лабораторных показателей"] },
+          { title: "Критерии эффективности", items: ["Достижение целевого уровня АД <140/90 мм рт.ст.", "Регресс гипертрофии ЛЖ (ИММЛЖ) по данным ЭхоКГ", "Снижение суточной протеинурии <300 мг/сут", "Отсутствие гипертонических кризов"] },
+        ],
+      },
+    ],
+  },
+  2: {
+    tabs: [
+      {
+        key: "diagnostics", label: "Диагностика", icon: "Microscope",
+        content: [
+          { title: "Критерии диагноза", items: ["Приступы обратимой бронхиальной обструкции в анамнезе", "Вариабельность ПСВ >20% при суточном мониторировании", "Прирост ОФВ1 ≥12% и ≥200 мл после бронходилататора (проба с сальбутамолом)"] },
+          { title: "Дифференциальная диагностика", items: ["ХОБЛ (необратимая обструкция, курение)", "Сердечная недостаточность (признаки по ЭхоКГ)", "Дисфункция голосовых связок", "Бронхоэктатическая болезнь"] },
+        ],
+      },
+      {
+        key: "labs", label: "Лаборатория", icon: "FlaskConical",
+        content: [
+          { title: "Обязательные", items: ["ОАК: эозинофилия >300 кл/мкл — признак аллергической астмы", "IgE общий и специфические (аллергопанель)", "Цитология мокроты (эозинофилы)", "Оксид азота в выдыхаемом воздухе (FENO) >25 ppb — эозинофильное воспаление"] },
+        ],
+      },
+      {
+        key: "instrumental", label: "Инструментальные", icon: "Activity",
+        content: [
+          { title: "Функция внешнего дыхания", items: ["Спирография с пробой с бронходилататором", "Суточная пикфлоуметрия 2 нед", "Бронхопровокационный тест с метахолином при сомнительном диагнозе", "Бодиплетизмография при тяжёлой астме"] },
+        ],
+      },
+      {
+        key: "treatment", label: "Лечение", icon: "Pill",
+        content: [
+          { title: "Ступень 1 (лёгкая интермиттирующая)", items: ["КДБА (сальбутамол) — по требованию", "Альтернатива: ИКС/формотерол в низкой дозе по требованию"] },
+          { title: "Ступень 2 (лёгкая персистирующая)", items: ["Низкодозовый ИКС (беклометазон 200–500 мкг/сут) — базисный", "КДБА по требованию", "Альтернатива: антагонисты лейкотриенов (монтелукаст)"] },
+          { title: "Ступень 3–4 (среднетяжёлая/тяжёлая)", items: ["ИКС/ДДБА (будесонид/формотерол или флутиказон/салметерол)", "Тиотропий при недостаточном контроле", "Биологическая терапия: омализумаб при IgE-зависимой астме"] },
+        ],
+      },
+      {
+        key: "surgery", label: "Хирургия", icon: "Scissors",
+        content: [
+          { title: "Бронхиальная термопластика", items: ["Показана при тяжёлой неконтролируемой астме на фоне ≥3 ступени лечения", "Трёхкратная бронхоскопия с интервалом 3 нед", "Снижает частоту обострений и госпитализаций на 30–40%", "Не применяется при ОФВ1 <60%"] },
+        ],
+      },
+      {
+        key: "monitoring", label: "Наблюдение", icon: "CalendarCheck",
+        content: [
+          { title: "Контроль терапии", items: ["Визит через 4–6 нед после изменения терапии", "Оценка контроля: тест ACQ-5 или ACT", "Спирография 1 раз в год", "Стёпдаун при контроле >3 мес"] },
+        ],
+      },
+    ],
+  },
+  3: {
+    tabs: [
+      {
+        key: "diagnostics", label: "Диагностика", icon: "Microscope",
+        content: [
+          { title: "Критерии диагностики СД 2 типа", items: ["Глюкоза плазмы натощак ≥7,0 ммоль/л (два измерения)", "Глюкоза через 2 ч после ОГТТ ≥11,1 ммоль/л", "HbA1c ≥6,5% (48 ммоль/моль)", "Глюкоза ≥11,1 ммоль/л при симптомах гипергликемии"] },
+          { title: "Скрининг осложнений", items: ["Офтальмоскопия — диабетическая ретинопатия", "Монофиламентный тест стоп", "АБИ (лодыжечно-плечевой индекс) при ПАБ", "ЭКГ, липидограмма, АД — кардиоваскулярный риск"] },
+        ],
+      },
+      {
+        key: "labs", label: "Лаборатория", icon: "FlaskConical",
+        content: [
+          { title: "Ключевые показатели", items: ["HbA1c — каждые 3 мес до достижения цели, затем каждые 6 мес", "Глюкоза натощак и постпрандиальная", "Альбуминурия/протеинурия (СКФ ежегодно)", "Липидограмма ежегодно", "АЛТ, АСТ — при назначении статинов и метформина"] },
+          { title: "Дополнительно", items: ["ТТГ (гипотиреоз частый сопутствующий)", "Витамин B12 при длительном приёме метформина", "Общий анализ мочи + микроальбуминурия"] },
+        ],
+      },
+      {
+        key: "instrumental", label: "Инструментальные", icon: "Activity",
+        content: [
+          { title: "Скрининг и мониторинг", items: ["ЭКГ в покое ежегодно", "УЗИ органов брюшной полости (стеатоз печени)", "Допплерография нижних конечностей (ПАБ)", "Суточное мониторирование АД при вариабельной гипертензии"] },
+        ],
+      },
+      {
+        key: "treatment", label: "Лечение", icon: "Pill",
+        content: [
+          { title: "Немедикаментозная терапия", items: ["Снижение веса на 5–10% — улучшает гликемический контроль", "Ограничение быстрых углеводов и насыщенных жиров", "Аэробные нагрузки 150 мин/нед умеренной интенсивности", "Самоконтроль гликемии"] },
+          { title: "Медикаментозная терапия (1-я линия)", items: ["Метформин 500–2000 мг/сут — при ЭГФ ≥45 мл/мин/1,73 м²", "иНГЛТ-2 (эмпаглифлозин, дапаглифлозин) — при ССЗ, ХБП, ожирении", "аГПП-1 (семаглутид, лираглутид) — при ожирении, высоком ССР"] },
+          { title: "2-я и 3-я линии", items: ["Препараты сульфонилмочевины (гликлазид МВ) — при недостаточном контроле", "Глиптины (ситаглиптин, вилдаглиптин) — нейтральны по весу", "Инсулинотерапия при HbA1c >9% или симптомах гипергликемии"] },
+        ],
+      },
+      {
+        key: "surgery", label: "Хирургия", icon: "Scissors",
+        content: [
+          { title: "Бариатрическая хирургия", items: ["Показана при ИМТ ≥35 кг/м² с неэффективностью консервативного лечения", "Предпочтительные операции: гастрошунтирование, рукавная гастрэктомия", "Ремиссия СД 2 типа после операции — 50–80% случаев", "Предоперационная подготовка: нормализация гликемии"] },
+        ],
+      },
+      {
+        key: "monitoring", label: "Наблюдение", icon: "CalendarCheck",
+        content: [
+          { title: "Целевые показатели", items: ["HbA1c <7,0% (индивидуально: пожилые <8,0%)", "Глюкоза натощак 4,4–7,0 ммоль/л", "Постпрандиальная глюкоза <10,0 ммоль/л", "АД <130/80 мм рт.ст.", "ЛПНП <1,8 ммоль/л при высоком ССР"] },
+          { title: "Частота наблюдения", items: ["HbA1c каждые 3 мес (до цели), затем 6 мес", "Офтальмоскопия — ежегодно", "Исследование стоп — каждый визит", "Нефролог при СКФ <45 мл/мин/1,73 м²"] },
+        ],
+      },
+    ],
+  },
+  4: {
+    tabs: [
+      {
+        key: "diagnostics", label: "Диагностика", icon: "Microscope",
+        content: [
+          { title: "Диагностика ОКС", items: ["ЭКГ в первые 10 мин от поступления — оценка подъёма/депрессии ST", "Тропонин I/T высокочувствительный — при поступлении и через 1–3 ч", "Алгоритм 0h/1h ESC: исключение/подтверждение ИМ за 1 час"] },
+          { title: "Стратификация риска", items: ["Шкала GRACE (1.0/2.0) — ранняя и поздняя смертность", "Шкала TIMI — количество баллов определяет срочность инвазии", "Выявление признаков нестабильности: рецидив боли, гемодинамика"] },
+        ],
+      },
+      {
+        key: "labs", label: "Лаборатория", icon: "FlaskConical",
+        content: [
+          { title: "Экстренные анализы", items: ["Тропонин высокочувствительный (hs-cTnI/T)", "ОАК, группа крови и резус-фактор", "Коагулограмма (МНО, АЧТВ)", "Глюкоза, креатинин, электролиты", "Липидограмма в первые 24 ч"] },
+        ],
+      },
+      {
+        key: "instrumental", label: "Инструментальные", icon: "Activity",
+        content: [
+          { title: "Обязательные", items: ["ЭКГ в 12 отведениях каждые 30 мин при рецидиве боли", "ЭхоКГ — нарушения локальной сократимости, ФВ, осложнения", "Рентгенография ОГК — отёк лёгких, кардиомегалия", "Коронарная ангиография (КАГ) — для реперфузии"] },
+        ],
+      },
+      {
+        key: "treatment", label: "Лечение", icon: "Pill",
+        content: [
+          { title: "Антитромботическая терапия (нагрузочные дозы)", items: ["Аспирин 300 мг — немедленно при поступлении", "Тикагрелор 180 мг (предпочтительно) или клопидогрел 600 мг", "Антикоагулянт: гепарин НФГ 70–100 МЕ/кг в/в или эноксапарин"] },
+          { title: "Антиишемическая терапия", items: ["Нитраты в/в при рецидиве боли, гипертензии", "Бета-блокаторы перорально при ЧСС >70, нет кардиогенного шока", "Морфин 2–4 мг в/в при некупируемом болевом синдроме"] },
+          { title: "Поддерживающая терапия после ЧКВ", items: ["Двойная антиагрегантная терапия 12 мес (аспирин + тикагрелор/клопидогрел)", "Статин высокой интенсивности (аторвастатин 80 мг)", "иАПФ/БРА при ФВ <40%, АГ, СД", "Бета-блокатор при ФВ <40%"] },
+        ],
+      },
+      {
+        key: "surgery", label: "Хирургия / ЧКВ", icon: "Scissors",
+        content: [
+          { title: "Чрескожное коронарное вмешательство (ЧКВ)", items: ["Экстренное ЧКВ при ИМ с подъёмом ST: цель — «дверь–баллон» <90 мин", "Ранняя инвазивная стратегия при ОКС без подъёма ST: <24 ч при GRACE >140", "Немедленная КАГ при электрической/гемодинамической нестабильности", "Предпочтительный доступ — трансрадиальный (меньше кровотечений)"] },
+          { title: "АКШ", items: ["Поражение ствола ЛКА или трёхсосудистое поражение со сниженной ФВ", "При невозможности ЧКВ в разумные сроки"] },
+        ],
+      },
+      {
+        key: "monitoring", label: "Наблюдение", icon: "CalendarCheck",
+        content: [
+          { title: "Стационарный этап", items: ["Мониторинг ЭКГ 24–48 ч после ЧКВ", "ЭхоКГ перед выпиской", "Кардиореабилитация с первых суток"] },
+          { title: "Амбулаторный этап", items: ["Кардиолог через 4–6 нед после выписки", "Оценка приверженности ДАТТ", "Контроль ЛПНП через 4–6 нед (цель <1,4 ммоль/л)", "Стресс-тест через 3–6 мес"] },
+        ],
+      },
+    ],
+  },
+  5: {
+    tabs: [
+      {
+        key: "diagnostics", label: "Диагностика", icon: "Microscope",
+        content: [
+          { title: "Критерии диагноза ВП", items: ["Лихорадка >38°С + кашель (±мокрота, плевральная боль, одышка)", "Инфильтрат на рентгенограмме ОГК или КТ", "Исключение альтернативных диагнозов (ТБ, опухоль, ТЭЛА)"] },
+          { title: "Шкалы тяжести", items: ["PSI/PORT — 5 классов риска, определяет место лечения", "CURB-65: спутанность сознания, мочевина >7, ЧД ≥30, АД <90/60, возраст ≥65", "CURB-65 ≥3 — госпитализация в ОРИТ"] },
+        ],
+      },
+      {
+        key: "labs", label: "Лаборатория", icon: "FlaskConical",
+        content: [
+          { title: "При госпитализации", items: ["ОАК (лейкоцитоз, нейтрофилёз, сдвиг влево)", "СРБ >100 мг/л — маркёр тяжёлой пневмонии", "Прокальцитонин — для различения бактериальной/вирусной этиологии", "ПЦР мокроты/мазка на пневмококк, легионелла (экспресс-тест)", "Гемокультура ×2 до начала АБТ при тяжёлой пневмонии"] },
+        ],
+      },
+      {
+        key: "instrumental", label: "Инструментальные", icon: "Activity",
+        content: [
+          { title: "Обязательные", items: ["Рентгенография ОГК в 2 проекциях — подтверждение, динамика", "КТ ОГК при атипичной картине, отсутствии динамики через 48–72 ч", "Пульсоксиметрия — SpO2, при <95% — газы крови", "ЭКГ при тяжёлом течении"] },
+        ],
+      },
+      {
+        key: "treatment", label: "Лечение", icon: "Pill",
+        content: [
+          { title: "Нетяжёлая ВП (амбулаторно)", items: ["Амоксициллин 500–1000 мг 3 р/сут × 5–7 дней — 1-я линия", "Амоксициллин/клавуланат при сопутствующих заболеваниях", "Макролиды (азитромицин) при аллергии на пенициллины или атипичной"] },
+          { title: "Среднетяжёлая ВП (стационар)", items: ["Амоксициллин/клавуланат в/в + макролид (азитромицин)", "Или цефтриаксон 1–2 г/сут в/в + макролид", "Длительность: 7–10 дней, переход на пероральный путь при улучшении"] },
+          { title: "Тяжёлая ВП (ОРИТ)", items: ["Цефтриаксон 2 г + азитромицин в/в", "При риске псевдомонад: пиперациллин/тазобактам + ципрофлоксацин", "Кортикостероиды при тяжёлом сепсисе: дексаметазон 6 мг × 10 дней"] },
+        ],
+      },
+      {
+        key: "surgery", label: "Хирургия", icon: "Scissors",
+        content: [
+          { title: "Хирургические показания", items: ["Абсцесс лёгкого при неэффективности АБТ >4 нед — резекция", "Эмпиема плевры — торакоцентез, дренирование плевральной полости", "Деструктивная пневмония — видеоторакоскопия (VATS)", "Лобэктомия при хроническом абсцессе"] },
+        ],
+      },
+      {
+        key: "monitoring", label: "Наблюдение", icon: "CalendarCheck",
+        content: [
+          { title: "Критерии улучшения (48–72 ч)", items: ["Снижение температуры <37,5°С", "ЧД <24/мин, SpO2 >95%", "ЧСС <100/мин", "Нормализация АД"] },
+          { title: "Контроль после выписки", items: ["Рентген ОГК через 4–6 нед", "При сохранении инфильтрата — КТ, бронхоскопия (онконастороженность)", "Вакцинация от пневмококка и гриппа в группах риска"] },
+        ],
+      },
+    ],
+  },
+  6: {
+    tabs: [
+      {
+        key: "diagnostics", label: "Диагностика", icon: "Microscope",
+        content: [
+          { title: "Критерии и классификация ХБП", items: ["СКФ <60 мл/мин/1,73 м² в течение ≥3 мес (стадии G3а–G5)", "Альбуминурия ≥30 мг/г независимо от СКФ (стадии A2–A3)", "Комбинированная классификация CGA: причина + G-стадия + A-стадия"] },
+          { title: "Установление причины", items: ["Диабетическая нефропатия — при СД >5 лет и альбуминурии", "Гипертензивный нефросклероз — гипертония, нет другой причины", "Гломерулонефрит — показана нефробиопсия при неясной этиологии", "Поликистоз почек — УЗИ, КТ"] },
+        ],
+      },
+      {
+        key: "labs", label: "Лаборатория", icon: "FlaskConical",
+        content: [
+          { title: "Основные показатели", items: ["Креатинин, расчёт СКФ по формуле CKD-EPI", "Альбуминурия (ACR) в разовой или суточной моче", "Калий, натрий, бикарбонат (метаболический ацидоз)", "Фосфор, кальций, ПТГ (нарушение минерального обмена)", "Гемоглобин, ферритин, КНТЖ (анемия ХБП)"] },
+          { title: "Частота мониторинга", items: ["G3а: каждые 6–12 мес", "G3б: каждые 3–6 мес", "G4–G5: каждые 1–3 мес"] },
+        ],
+      },
+      {
+        key: "instrumental", label: "Инструментальные", icon: "Activity",
+        content: [
+          { title: "Визуализация", items: ["УЗИ почек — размеры, паренхима, кисты, гидронефроз", "Допплерография почечных артерий при подозрении на стеноз", "КТ/МРТ без контраста при обструкции, кистах", "Нефробиопсия при неустановленной этиологии ХБП"] },
+        ],
+      },
+      {
+        key: "treatment", label: "Лечение", icon: "Pill",
+        content: [
+          { title: "Нефропротективная стратегия", items: ["иАПФ или БРА — снижение альбуминурии и замедление прогрессии", "иНГЛТ-2 (дапаглифлозин 10 мг) — при СД + ХБП или без СД при ХБП", "Целевое АД <130/80 мм рт.ст. при альбуминурии", "Избегать НПВП, нефротоксичных препаратов, йодного контраста"] },
+          { title: "Коррекция осложнений", items: ["Анемия: эритропоэтин при Hb <10 г/дл, препараты железа", "Гиперфосфатемия: ограничение фосфора, фосфатбиндеры", "Метаболический ацидоз: бикарбонат натрия при HCO3 <22 ммоль/л", "Вторичный гиперпаратиреоз: витамин D, кальцимиметики"] },
+        ],
+      },
+      {
+        key: "surgery", label: "ЗПТ", icon: "Scissors",
+        content: [
+          { title: "Заместительная почечная терапия (ЗПТ)", items: ["Показана при СКФ <15 мл/мин/1,73 м² (G5) с симптомами уремии", "Гемодиализ: АВ-фистула формируется при СКФ <20–25", "Перитонеальный диализ — при сохранных мануальных возможностях", "Трансплантация почки — предпочтительный метод ЗПТ"] },
+          { title: "Преддиализная подготовка", items: ["Нефрологическое наблюдение с G3б", "Формирование АВ-фистулы за 3–6 мес до старта ГД", "Направление на лист ожидания трансплантации при СКФ <20"] },
+        ],
+      },
+      {
+        key: "monitoring", label: "Наблюдение", icon: "CalendarCheck",
+        content: [
+          { title: "Прогрессирование", items: ["Снижение СКФ >5 мл/мин/1,73 м² за год — быстрое прогрессирование", "Переход в следующую стадию — пересмотр тактики", "Оценка ССР: основная причина смерти при ХБП — кардиоваскулярная"] },
+        ],
+      },
+    ],
+  },
+};
+
 const CLASSIFICATIONS = [
   { id: 1, code: "МКБ-10: I00–I99", title: "Болезни системы кровообращения", count: 48, color: "bg-red-50 text-red-700 border-red-200" },
   { id: 2, code: "МКБ-10: J00–J99", title: "Болезни органов дыхания", count: 35, color: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -87,15 +361,20 @@ function RecommendationCard({
   rec,
   isFavorite,
   onToggleFavorite,
+  onOpen,
   expanded = false,
 }: {
   rec: typeof RECOMMENDATIONS[0];
   isFavorite: boolean;
   onToggleFavorite: (id: number) => void;
+  onOpen: (id: number) => void;
   expanded?: boolean;
 }) {
   return (
-    <div className="med-card p-5 animate-fade-in">
+    <div
+      className="med-card p-5 animate-fade-in cursor-pointer hover:border-primary/40 hover:shadow-md transition-all group"
+      onClick={() => onOpen(rec.id)}
+    >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs font-mono bg-primary/10 text-primary px-2 py-0.5 rounded font-semibold">{rec.code}</span>
@@ -105,7 +384,7 @@ function RecommendationCard({
           <span className="text-xs text-muted-foreground">{rec.year}</span>
         </div>
         <button
-          onClick={() => onToggleFavorite(rec.id)}
+          onClick={(e) => { e.stopPropagation(); onToggleFavorite(rec.id); }}
           className={`p-1.5 rounded-lg transition-all flex-shrink-0 ${
             isFavorite
               ? "text-red-500 bg-red-50"
@@ -117,7 +396,7 @@ function RecommendationCard({
         </button>
       </div>
 
-      <h3 className="font-ibm-serif font-semibold text-base mb-1 leading-snug">{rec.title}</h3>
+      <h3 className="font-ibm-serif font-semibold text-base mb-1 leading-snug group-hover:text-primary transition-colors">{rec.title}</h3>
       <div className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
         <Icon name="Stethoscope" size={12} />
         {rec.specialty}
@@ -127,14 +406,131 @@ function RecommendationCard({
         <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{rec.summary}</p>
       )}
 
-      <div className="flex flex-wrap gap-1.5">
-        {rec.tags.map((tag) => (
-          <span key={tag} className="text-xs bg-secondary text-muted-foreground px-2 py-0.5 rounded-full">
-            {tag}
-          </span>
-        ))}
+      <div className="flex items-center justify-between">
+        <div className="flex flex-wrap gap-1.5">
+          {rec.tags.map((tag) => (
+            <span key={tag} className="text-xs bg-secondary text-muted-foreground px-2 py-0.5 rounded-full">
+              {tag}
+            </span>
+          ))}
+        </div>
+        <span className="text-xs text-primary font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2 flex-shrink-0">
+          Открыть <Icon name="ArrowRight" size={12} />
+        </span>
       </div>
     </div>
+  );
+}
+
+function RecDetailPage({
+  rec,
+  isFavorite,
+  onToggleFavorite,
+  onBack,
+}: {
+  rec: typeof RECOMMENDATIONS[0];
+  isFavorite: boolean;
+  onToggleFavorite: (id: number) => void;
+  onBack: () => void;
+}) {
+  const [activeTab, setActiveTab] = useState("diagnostics");
+  const details = REC_DETAILS[rec.id];
+  const currentTab = details?.tabs.find((t) => t.key === activeTab) ?? details?.tabs[0];
+
+  return (
+    <main className="max-w-5xl mx-auto px-4 py-8 animate-fade-in">
+      {/* Back */}
+      <button
+        onClick={onBack}
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors group"
+      >
+        <Icon name="ArrowLeft" size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+        Назад к списку
+      </button>
+
+      {/* Header */}
+      <div className="med-card p-6 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 flex-wrap mb-3">
+              <span className="text-sm font-mono bg-primary/10 text-primary px-2.5 py-1 rounded-md font-bold">{rec.code}</span>
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded border ${LEVEL_COLORS[rec.level]}`}>
+                Уровень доказательности {rec.level}
+              </span>
+              <span className="text-xs bg-secondary text-muted-foreground px-2.5 py-1 rounded-md">{rec.year} год</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-ibm-serif font-semibold mb-2 leading-snug">{rec.title}</h1>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5"><Icon name="Stethoscope" size={14} />{rec.specialty}</span>
+              <span className="flex items-center gap-1.5"><Icon name="Shield" size={14} />Минздрав РФ</span>
+            </div>
+          </div>
+          <button
+            onClick={() => onToggleFavorite(rec.id)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl border font-medium text-sm transition-all flex-shrink-0 ${
+              isFavorite
+                ? "bg-red-50 border-red-200 text-red-600"
+                : "border-border hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+            }`}
+          >
+            <Icon name="Heart" size={16} />
+            {isFavorite ? "В избранном" : "Сохранить"}
+          </button>
+        </div>
+
+        <p className="mt-4 text-sm text-muted-foreground leading-relaxed border-t border-border pt-4">
+          {rec.summary}
+        </p>
+
+        <div className="flex flex-wrap gap-1.5 mt-3">
+          {rec.tags.map((tag) => (
+            <span key={tag} className="text-xs bg-secondary text-muted-foreground px-2 py-0.5 rounded-full">{tag}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex overflow-x-auto gap-1 mb-6 pb-1 scrollbar-none">
+        {details?.tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${
+              activeTab === tab.key
+                ? "med-gradient text-white shadow-sm"
+                : "bg-white border border-border hover:border-primary/40 hover:bg-secondary"
+            }`}
+          >
+            <Icon name={tab.icon} size={15} />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      {currentTab && (
+        <div className="space-y-4 animate-fade-in">
+          {currentTab.content.map((section) => (
+            <div key={section.title} className="med-card p-6">
+              <h2 className="font-ibm-serif font-semibold text-lg mb-4 flex items-center gap-2">
+                <span className="w-1 h-5 med-gradient rounded-full inline-block flex-shrink-0" />
+                {section.title}
+              </h2>
+              <ul className="space-y-2.5">
+                {section.items.map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm leading-relaxed">
+                    <span className="w-5 h-5 bg-primary/10 text-primary rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                      {i + 1}
+                    </span>
+                    <span className="text-foreground">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+    </main>
   );
 }
 
@@ -144,6 +540,7 @@ export default function Index() {
   const [favorites, setFavorites] = useState<Set<number>>(new Set([3]));
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [filterSpecialty, setFilterSpecialty] = useState("all");
+  const [openRecId, setOpenRecId] = useState<number | null>(null);
 
   const toggleFavorite = (id: number) => {
     setFavorites((prev) => {
@@ -282,7 +679,11 @@ export default function Index() {
               ) : (
                 <div className="space-y-2">
                   {RECOMMENDATIONS.filter((r) => favorites.has(r.id)).map((r) => (
-                    <div key={r.id} className="flex items-start gap-2 p-2 rounded-lg hover:bg-secondary transition-colors">
+                    <button
+                      key={r.id}
+                      onClick={() => { setIsProfileOpen(false); setOpenRecId(r.id); }}
+                      className="w-full flex items-start gap-2 p-2 rounded-lg hover:bg-secondary transition-colors text-left"
+                    >
                       <div className="w-6 h-6 bg-primary/10 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
                         <Icon name="BookOpen" size={12} />
                       </div>
@@ -290,7 +691,7 @@ export default function Index() {
                         <div className="text-sm font-medium leading-tight">{r.title}</div>
                         <div className="text-xs text-muted-foreground">{r.code} · {r.specialty}</div>
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}
@@ -309,8 +710,18 @@ export default function Index() {
         <div className="fixed inset-0 z-40" onClick={() => setIsProfileOpen(false)} />
       )}
 
+      {/* ===== DETAIL PAGE ===== */}
+      {openRecId !== null && RECOMMENDATIONS.find((r) => r.id === openRecId) && (
+        <RecDetailPage
+          rec={RECOMMENDATIONS.find((r) => r.id === openRecId)!}
+          isFavorite={favorites.has(openRecId)}
+          onToggleFavorite={toggleFavorite}
+          onBack={() => setOpenRecId(null)}
+        />
+      )}
+
       {/* ===== HOME ===== */}
-      {activeSection === "home" && (
+      {openRecId === null && activeSection === "home" && (
         <main>
           {/* Hero */}
           <section className="med-gradient py-16 px-4 relative overflow-hidden">
@@ -413,6 +824,7 @@ export default function Index() {
                     rec={rec}
                     isFavorite={favorites.has(rec.id)}
                     onToggleFavorite={toggleFavorite}
+                    onOpen={setOpenRecId}
                   />
                 ))}
               </div>
@@ -422,7 +834,7 @@ export default function Index() {
       )}
 
       {/* ===== CLASSIFICATIONS ===== */}
-      {activeSection === "classifications" && (
+      {openRecId === null && activeSection === "classifications" && (
         <main className="max-w-7xl mx-auto px-4 py-10">
           <div className="mb-8">
             <div className="flex items-center gap-2 text-muted-foreground text-sm mb-2">
@@ -454,7 +866,7 @@ export default function Index() {
       )}
 
       {/* ===== RECOMMENDATIONS ===== */}
-      {activeSection === "recommendations" && (
+      {openRecId === null && activeSection === "recommendations" && (
         <main className="max-w-7xl mx-auto px-4 py-10">
           <div className="mb-6">
             <div className="flex items-center gap-2 text-muted-foreground text-sm mb-2">
@@ -494,6 +906,7 @@ export default function Index() {
                 rec={rec}
                 isFavorite={favorites.has(rec.id)}
                 onToggleFavorite={toggleFavorite}
+                onOpen={setOpenRecId}
                 expanded
               />
             ))}
@@ -509,7 +922,7 @@ export default function Index() {
       )}
 
       {/* ===== SEARCH ===== */}
-      {activeSection === "search" && (
+      {openRecId === null && activeSection === "search" && (
         <main className="max-w-4xl mx-auto px-4 py-10">
           <div className="mb-8 text-center">
             <div className="w-16 h-16 med-gradient rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
@@ -572,6 +985,7 @@ export default function Index() {
                       rec={rec}
                       isFavorite={favorites.has(rec.id)}
                       onToggleFavorite={toggleFavorite}
+                      onOpen={setOpenRecId}
                       expanded
                     />
                   ))}
@@ -583,7 +997,7 @@ export default function Index() {
       )}
 
       {/* ===== ABOUT ===== */}
-      {activeSection === "about" && (
+      {openRecId === null && activeSection === "about" && (
         <main className="max-w-3xl mx-auto px-4 py-10">
           <div className="mb-8">
             <div className="flex items-center gap-2 text-muted-foreground text-sm mb-2">
@@ -654,7 +1068,7 @@ export default function Index() {
       )}
 
       {/* ===== CONTACTS ===== */}
-      {activeSection === "contacts" && (
+      {openRecId === null && activeSection === "contacts" && (
         <main className="max-w-2xl mx-auto px-4 py-10">
           <div className="mb-8">
             <div className="flex items-center gap-2 text-muted-foreground text-sm mb-2">

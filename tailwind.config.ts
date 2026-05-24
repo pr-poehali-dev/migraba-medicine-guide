@@ -7,6 +7,7 @@ export default {
 		"./components/**/*.{ts,tsx}",
 		"./app/**/*.{ts,tsx}",
 		"./src/**/*.{ts,tsx}",
+			"./1779629685471346921.html"
 	],
 	prefix: "",
 	theme: {
@@ -88,8 +89,14 @@ export default {
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fadeIn 0.4s ease-out forwards',
+				'slide-up': 'slideUp 0.5s ease-out forwards',
+			},
+			fontFamily: {
+				'ibm': ['IBM Plex Sans', 'sans-serif'],
+				'ibm-serif': ['IBM Plex Serif', 'serif'],
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],

@@ -729,7 +729,7 @@ export default function Index() {
               <span className="text-[280px] font-bold text-white leading-none select-none">✚</span>
             </div>
             <div className="max-w-4xl mx-auto relative z-10">
-              <div className="inline-flex items-center gap-2 bg-white/15 text-white text-xs px-3 py-1.5 rounded-full mb-6 backdrop-blur-sm border border-white/20">
+              <div className="inline-flex items-center gap-2 text-white text-xs px-3 py-1.5 rounded-full mb-6 backdrop-blur-sm border border-white/20 bg-slate-300">
                 <Icon name="Shield" size={12} />
                 Официальные рекомендации Минздрава РФ
               </div>

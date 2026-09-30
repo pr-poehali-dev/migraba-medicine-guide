@@ -733,7 +733,7 @@ export default function Index() {
                 <Icon name="Shield" size={12} />
                 Официальные рекомендации Минздрава РФ
               </div>
-              <h1 className="sm:text-5xl font-ibm-serif text-white mb-4 leading-tight animate-fade-in font-black text-5xl">
+              <h1 className="sm:text-5xl font-ibm-serif mb-4 leading-tight animate-fade-in font-black text-5xl text-[#000000]">
                 Клинические рекомендации<br className="hidden sm:block" /> для врачей
               </h1>
               <p className="text-white/80 text-lg mb-8 max-w-2xl animate-fade-in stagger-1">
